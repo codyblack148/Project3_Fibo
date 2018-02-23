@@ -126,31 +126,38 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 	if(pidl == 0)
 	{
 		// Enable child 1 signal handlers (disable parent handlers)
-
+    sigaction(SIGALRM, &c1_realt_sa, NULL);
+    sigaction(SIGVTALRM, &c1_virtt_sa, NULL);
+    sigaction(SIGPROF, &c1_proft_sa, NULL);
 		// Set child 1 itimers
-
+    if(setitimer(ITIMER_REAL, &c1_realt, NULL) == -1)
+  			perror("child 1 real timer set error");
+  	if(setitimer(ITIMER_VIRTUAL, &c1_virtt, NULL) == -1)
+  			perror("child 1 virtual timer set error");
+  	if(setitimer(ITIMER_PROF, &c1_proft, NULL) == -1)
+  			perror("child 1 profile timer set error");
 		// Start child 1 on the fibonacci program
 		fib = fibonacci(fibarg);
 
 		// Read child 1 itimer values and report them
-		getitimer(ITIMER_PROF, &c1_proft);
-		getitimer(ITIMER_REAL, &c1_realt);
-		getitimer(ITIMER_VIRTUAL, &c1_virtt);
+    if(getitimer(ITIMER_PROF, &c1_proft) == -1)
+			perror("child 1 real timer set error");
+		if(getitimer(ITIMER_REAL, &c1_realt) == -1)
+			perror("child 1 virtual timer set error");
+		if(getitimer(ITIMER_VIRTUAL, &c1_virtt) == -1)
+			perror("child 1 profile timer set error");
 		printf("\n");
-		printf ("Child 1 fib = %ld, real time = %ld sec, %ld msec\n",
+    printf ("Child 1 fib = %ld\nChild 1 real time = %ld sec, %ld msec\nChild 1 cpu time = %ld sec, %ld msec\nChild 1 user time = %ld sec, %ld msec\nChild 1 kernel time = %ld sec, %ld msec\n",
 			fib, c1_realt_secs,
-			elapsed_usecs(c1_realt.it_value.tv_sec,
-						  c1_realt.it_value.tv_usec) / 1000);
-		printf("Child 1 fib = %ld, cpu time = %ld sec, %ld msec\n",
-				fib, c1_proft_secs,
+			  elapsed_usecs(c1_realt.it_value.tv_sec,
+						  c1_realt.it_value.tv_usec) / 1000,
+				c1_proft_secs,
 				elapsed_usecs(c1_proft.it_value.tv_sec,
-							  c1_proft.it_value.tv_usec) / 1000);
-		printf ("Child 1 fib = %ld, user time = %ld sec, %ld msec\n",
-				fib, c1_virtt_secs,
+							  c1_proft.it_value.tv_usec) / 1000,
+				c1_virtt_secs,
 				elapsed_usecs(c1_virtt.it_value.tv_sec,
-							  c1_virtt.it_value.tv_usec) / 1000);
-		printf("Child 1 fib = %ld, kernel time = %ld sec, %ld msec\n",
-				fib, delta_time(c1_proft, c1_virtt),
+							  c1_virtt.it_value.tv_usec) / 1000,
+				delta_time(c1_proft, c1_virtt),
 				(elapsed_usecs(c1_proft.it_value.tv_sec,
 							   c1_proft.it_value.tv_usec) / 1000) -
 				(elapsed_usecs(c1_virtt.it_value.tv_sec,
@@ -165,13 +172,44 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 		if(pid2 == 0)
 		{
 			// Enable child 2 signal handlers
-			...
+      sigaction(SIGALRM, &c2_realt_sa, NULL);
+      sigaction(SIGVTALRM, &c2_virtt_sa, NULL);
+      sigaction(SIGPROF, &c2_proft_sa, NULL);
 			// Set child 2 itimers
-			...
+      if(setitimer(ITIMER_REAL, &c2_realt, NULL) == -1)
+        perror("child 2 real timer set error");
+      if(setitimer(ITIMER_VIRTUAL, &c2_virtt, NULL) == -1)
+        perror("child 2 virtual timer set error");
+      if(setitimer(ITIMER_PROF, &c2_proft, NULL) == -1)
+        perror("child 2 profile timer set error");
 			// Start child 2 on the fibonacci program
 			fib = fibonacci(fibarg);
 			// Read child 2 itimer values and report them
-			...
+      if(getitimer(ITIMER_PROF, &c2_proft) == -1)
+				perror("in main @ c2_getitimer(ITIMER_PROF, &c2_proft)");
+			if(getitimer(ITIMER_REAL, &c2_realt) == -1)
+				perror("in main @ c2_getitimer(ITIMER_REAL, &c2_realt)");
+			if(getitimer(ITIMER_VIRTUAL, &c2_virtt) == -1)
+				perror("in main @ c2_getitimer(ITIMER_REAL, &c2_virtt)");
+
+        printf("\n");
+			printf ("Child 2 fib = %ld\nChild 2 real time = %ld sec, %ld msec\nChild 2 cpu time = %ld sec, %ld msec\nChild 2 user time = %ld sec, %ld msec\nChild 2 kernel time = %ld sec, %ld msec\n",
+			fib, c2_realt_secs,
+			elapsed_usecs(c2_realt.it_value.tv_sec,
+						  c2_realt.it_value.tv_usec) / 1000,
+				c2_proft_secs,
+				elapsed_usecs(c2_proft.it_value.tv_sec,
+							  c2_proft.it_value.tv_usec) / 1000,
+				c2_virtt_secs,
+				elapsed_usecs(c2_virtt.it_value.tv_sec,
+							  c2_virtt.it_value.tv_usec) / 1000,
+				delta_time(c2_proft, c2_virtt),
+				(elapsed_usecs(c2_proft.it_value.tv_sec,
+							   c2_proft.it_value.tv_usec) / 1000) -
+				(elapsed_usecs(c2_virtt.it_value.tv_sec,
+							   c2_virtt.it_value.tv_usec) / 1000));
+			fflush(stdout);
+			exit(0);
 		}
 		else
 		{ 	/* this is the parent */
@@ -184,7 +222,31 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 			waitpid(0, &status, 0);
 
 			// Read parent itimer values and report them
-			...
+      if(getitimer(ITIMER_PROF, &p_proft) == -1)
+        perror("in main @ p_getitimer(ITIMER_PROF, &p_proft)");
+      if(getitimer(ITIMER_REAL, &p_realt) == -1)
+        perror("in main @ p_getitimer(ITIMER_REAL, &p_realt)");
+      if(getitimer(ITIMER_VIRTUAL, &p_virtt) == -1)
+        perror("in main @ p_getitimer(ITIMER_REAL, &p_virtt)");
+        printf("\n");
+  			printf ("Parent fib = %ld\nParent real time = %ld sec, %ld msec\nParent cpu time = %ld sec, %ld msec\nParent user time = %ld sec, %ld msec\nParent kernel time = %ld sec, %ld msec\n",
+  			fib, p_realt_secs,
+  			elapsed_usecs(p_realt.it_value.tv_sec,
+  						  p_realt.it_value.tv_usec) / 1000,
+  				p_proft_secs,
+  				elapsed_usecs(p_proft.it_value.tv_sec,
+  							  p_proft.it_value.tv_usec) / 1000,
+  				p_virtt_secs,
+  				elapsed_usecs(p_virtt.it_value.tv_sec,
+  							  p_virtt.it_value.tv_usec) / 1000,
+  				delta_time(p_proft, p_virtt),
+  				(elapsed_usecs(p_proft.it_value.tv_sec,
+  							   p_proft.it_value.tv_usec) / 1000) -
+  				(elapsed_usecs(p_virtt.it_value.tv_sec,
+  							   p_virtt.it_value.tv_usec) / 1000));
+  			fflush(stdout);
+  			exit(0);
+
 		}
 			printf("this line should never be printed\n");
 	}
@@ -198,6 +260,15 @@ long unsigned int fibonacci(unsigned int n)
 		return 1;
 	else
 		return(fibonacci(n-1) + fibonacci(n-2));
+}
+long unsigned int elapsed_usecs(long sec, long usec)
+{
+	return ((sec*1000000) + usec);
+}
+
+long unsigned int delta_time(struct itimerval n, struct itimerval m)
+{
+	return m.it_value.tv_sec + n.it_value.tv_sec;
 }
 static void p_realt_handler(int signo)
 {
