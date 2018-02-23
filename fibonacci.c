@@ -272,54 +272,95 @@ long unsigned int delta_time(struct itimerval n, struct itimerval m)
 }
 static void p_realt_handler(int signo)
 {
-	p_realt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in p_realt_handler : wrong signal %d", signo);
+	else
+	{
+		p_realt_secs += 1;
+		return;
+	}
 }
 
 static void p_virtt_handler(int signo)
 {
-	p_virtt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in p_virtt_handler : wrong signal %d", signo);
+	else
+	{
+		p_virtt_secs += 1;
+		return;
+	}
 }
-
 static void p_proft_handler(int signo)
 {
-	p_proft_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in p_proft_handler : wrong signal %d", signo);
+	else
+	{
+		p_proft_secs += 1;
+		return;
+	}
 }
 
 static void c1_realt_handler(int signo)
 {
-	c1_realt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c1_realt_handler : wrong signal %d", signo);
+	else
+	{
+		c1_realt_secs += 1;
+		return;
+	}
 }
 
 static void c1_virtt_handler(int signo)
 {
-	c1_virtt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c1_virtt_handler : wrong signal %d", signo);
+	else
+	{
+		c1_virtt_secs += 1;
+		return;
+	}
 }
-
 static void c1_proft_handler(int signo)
 {
-	c1_proft_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c1_proft_handler : wrong signal %d", signo);
+	else
+	{
+		c1_proft_secs += 1;
+		return;
+	}
 }
-
 static void c2_realt_handler(int signo)
 {
-	c2_realt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c2_realt_handler : wrong signal %d", signo);
+	else
+	{
+		c2_realt_secs += 1;
+		return;
+	}
 }
 
 static void c2_virtt_handler(int signo)
 {
-	c2_virtt_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c2_virtt_handler : wrong signal %d", signo);
+	else
+	{
+		c2_virtt_secs += 1;
+		return;
+	}
 }
-
 static void c2_proft_handler(int signo)
 {
-	c2_proft_secs++;
-	return;
+	if(signo != SIGALRM)
+		fprintf(stderr, "in c2_proft_handler : wrong signal %d", signo);
+	else
+	{
+		c2_proft_secs += 1;
+		return;
+	}
 }

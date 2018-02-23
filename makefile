@@ -13,7 +13,7 @@ clean:
 	rm -f *~
 	rm -f core
 	rm -f *.o
-	rm -f pj3
+	rm -f fibonacci
 
 %.o: %.c
 	$(CC) $(COMPILE_FLAGS) -c $< -o $@
