@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	long unsigned fib = 0;
 	int pidl, pid2;
 	unsigned int fibarg;
-	int status;
+	int status,saCheck1,saCheck2,saCheck3,saCheck4,saCheck5,saCheck6,saCheck7,saCheck8,saCheck9;
 	// Get command line argument, fibarg (the value N in the problem
 	// statement)
   if(argc != 2)
@@ -109,43 +109,78 @@ c2_virtt_sa.sa_handler = &c2_virtt_handler;
 c2_proft_sa.sa_handler = &c2_proft_handler;
 
 	// Enable parent's signal handlers
-  sigaction(SIGALRM, &p_realt_sa, NULL);
-	sigaction(SIGVTALRM, &p_virtt_sa, NULL);
-	sigaction(SIGPROF, &p_proft_sa, NULL);
+  saCheck1 = sigaction(SIGALRM, &p_realt_sa, NULL);
+	saCheck2 = sigaction(SIGVTALRM, &p_virtt_sa, NULL);
+	saCheck3 = sigaction(SIGPROF, &p_proft_sa, NULL);
+	if(saCheck1 == -1 || saCheck2 == -1 || saCheck3 == -1){
+		perror("error: ");
+		exit(-5);
+	}
 
 	// Set parent's itimers
   if(setitimer(ITIMER_REAL, &p_realt, NULL) == -1)
-		perror("parent real timer set error");
+		{
+			perror("parent real timer set error");
+			exit(-6);
+		}
 	if(setitimer(ITIMER_VIRTUAL, &p_virtt, NULL) == -1)
-		perror("parent virtual timer set error");
+	{
+		perror("parent real timer set error");
+		exit(-6);
+	}
 	if(setitimer(ITIMER_PROF, &p_proft, NULL) == -1)
-		perror("parent profile timer set error");
+	{
+		perror("parent real timer set error");
+		exit(-6);
+	}
 
 	pidl = fork();
 
 	if(pidl == 0)
 	{
 		// Enable child 1 signal handlers (disable parent handlers)
-    sigaction(SIGALRM, &c1_realt_sa, NULL);
-    sigaction(SIGVTALRM, &c1_virtt_sa, NULL);
-    sigaction(SIGPROF, &c1_proft_sa, NULL);
+    saCheck4 = sigaction(SIGALRM, &c1_realt_sa, NULL);
+    saCheck5 = sigaction(SIGVTALRM, &c1_virtt_sa, NULL);
+    saCheck6 = sigaction(SIGPROF, &c1_proft_sa, NULL);
+		if(saCheck4 == -1 || saCheck5 == -1 || saCheck6 == -1){
+			perror("error: ");
+			exit(-5);
+		}
 		// Set child 1 itimers
     if(setitimer(ITIMER_REAL, &c1_realt, NULL) == -1)
-  			perror("child 1 real timer set error");
+		{
+			perror("c1 real timer set error");
+			exit(-6);
+		}
   	if(setitimer(ITIMER_VIRTUAL, &c1_virtt, NULL) == -1)
-  			perror("child 1 virtual timer set error");
+		{
+			perror("c1 real timer set error");
+			exit(-6);
+		}
   	if(setitimer(ITIMER_PROF, &c1_proft, NULL) == -1)
-  			perror("child 1 profile timer set error");
+		{
+			perror("c1 real timer set error");
+			exit(-6);
+		}
 		// Start child 1 on the fibonacci program
 		fib = fibonacci(fibarg);
 
 		// Read child 1 itimer values and report them
     if(getitimer(ITIMER_PROF, &c1_proft) == -1)
-			perror("child 1 real timer set error");
+			{
+				perror("child 1 real timer get error");
+				exit(-6);
+			}
 		if(getitimer(ITIMER_REAL, &c1_realt) == -1)
-			perror("child 1 virtual timer set error");
+		{
+			perror("child 1 real timer get error");
+			exit(-6);
+		}
 		if(getitimer(ITIMER_VIRTUAL, &c1_virtt) == -1)
-			perror("child 1 profile timer set error");
+		{
+			perror("child 1 real timer get error");
+			exit(-6);
+		}
 		printf("\n");
     printf ("Child 1 fib = %ld\nChild 1 real time = %ld sec, %ld msec\nChild 1 cpu time = %ld sec, %ld msec\nChild 1 user time = %ld sec, %ld msec\nChild 1 kernel time = %ld sec, %ld msec\n",
 			fib, c1_realt_secs,
@@ -172,25 +207,47 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 		if(pid2 == 0)
 		{
 			// Enable child 2 signal handlers
-      sigaction(SIGALRM, &c2_realt_sa, NULL);
-      sigaction(SIGVTALRM, &c2_virtt_sa, NULL);
-      sigaction(SIGPROF, &c2_proft_sa, NULL);
+      saCheck7 = sigaction(SIGALRM, &c2_realt_sa, NULL);
+      saCheck8 = sigaction(SIGVTALRM, &c2_virtt_sa, NULL);
+      saCheck9 = sigaction(SIGPROF, &c2_proft_sa, NULL);
+			if(saCheck7 == -1 || saCheck8 == -1 || saCheck9 == -1){
+				perror("error: ");
+				exit(-5);
+			}
 			// Set child 2 itimers
       if(setitimer(ITIMER_REAL, &c2_realt, NULL) == -1)
-        perror("child 2 real timer set error");
+			{
+				perror("child 2 real timer set error");
+				exit(-6);
+			}
       if(setitimer(ITIMER_VIRTUAL, &c2_virtt, NULL) == -1)
-        perror("child 2 virtual timer set error");
+			{
+				perror("child 2 real timer set error");
+				exit(-6);
+			}
       if(setitimer(ITIMER_PROF, &c2_proft, NULL) == -1)
-        perror("child 2 profile timer set error");
+			{
+				perror("child 2 real timer set error");
+				exit(-6);
+			}
 			// Start child 2 on the fibonacci program
 			fib = fibonacci(fibarg);
 			// Read child 2 itimer values and report them
       if(getitimer(ITIMER_PROF, &c2_proft) == -1)
-				perror("in main @ c2_getitimer(ITIMER_PROF, &c2_proft)");
+			{
+				perror("c2 real timer get error");
+				exit(-6);
+			}
 			if(getitimer(ITIMER_REAL, &c2_realt) == -1)
-				perror("in main @ c2_getitimer(ITIMER_REAL, &c2_realt)");
+			{
+				perror("c2 real timer get error");
+				exit(-6);
+			}
 			if(getitimer(ITIMER_VIRTUAL, &c2_virtt) == -1)
-				perror("in main @ c2_getitimer(ITIMER_REAL, &c2_virtt)");
+			{
+				perror("c2 real timer get error");
+				exit(-6);
+			}
 
         printf("\n");
 			printf ("Child 2 fib = %ld\nChild 2 real time = %ld sec, %ld msec\nChild 2 cpu time = %ld sec, %ld msec\nChild 2 user time = %ld sec, %ld msec\nChild 2 kernel time = %ld sec, %ld msec\n",
@@ -223,11 +280,20 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 
 			// Read parent itimer values and report them
       if(getitimer(ITIMER_PROF, &p_proft) == -1)
-        perror("in main @ p_getitimer(ITIMER_PROF, &p_proft)");
+			{
+				perror("parent real timer get error");
+				exit(-6);
+			}
       if(getitimer(ITIMER_REAL, &p_realt) == -1)
-        perror("in main @ p_getitimer(ITIMER_REAL, &p_realt)");
+			{
+				perror("parent real timer get error");
+				exit(-6);
+			}
       if(getitimer(ITIMER_VIRTUAL, &p_virtt) == -1)
-        perror("in main @ p_getitimer(ITIMER_REAL, &p_virtt)");
+			{
+				perror("parent real timer get error");
+				exit(-6);
+			}
         printf("\n");
   			printf ("Parent fib = %ld\nParent real time = %ld sec, %ld msec\nParent cpu time = %ld sec, %ld msec\nParent user time = %ld sec, %ld msec\nParent kernel time = %ld sec, %ld msec\n",
   			fib, p_realt_secs,
@@ -268,99 +334,45 @@ long unsigned int elapsed_usecs(long sec, long usec)
 
 long unsigned int delta_time(struct itimerval n, struct itimerval m)
 {
-	return m.it_value.tv_sec + n.it_value.tv_sec;
+	return m.it_value.tv_sec - n.it_value.tv_sec;
 }
 static void p_realt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in p_realt_handler : wrong signal %d", signo);
-	else
-	{
-		p_realt_secs += 1;
-		return;
-	}
+		p_realt_secs++;
 }
 
 static void p_virtt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in p_virtt_handler : wrong signal %d", signo);
-	else
-	{
-		p_virtt_secs += 1;
-		return;
-	}
+		p_virtt_secs++;
 }
 static void p_proft_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in p_proft_handler : wrong signal %d", signo);
-	else
-	{
-		p_proft_secs += 1;
-		return;
-	}
+		p_proft_secs++;
 }
 
 static void c1_realt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c1_realt_handler : wrong signal %d", signo);
-	else
-	{
-		c1_realt_secs += 1;
-		return;
-	}
+		c1_realt_secs++;
 }
 
 static void c1_virtt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c1_virtt_handler : wrong signal %d", signo);
-	else
-	{
-		c1_virtt_secs += 1;
-		return;
-	}
+		c1_virtt_secs++;
 }
 static void c1_proft_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c1_proft_handler : wrong signal %d", signo);
-	else
-	{
-		c1_proft_secs += 1;
-		return;
-	}
+		c1_proft_secs++;
 }
 static void c2_realt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c2_realt_handler : wrong signal %d", signo);
-	else
-	{
-		c2_realt_secs += 1;
-		return;
-	}
+		c2_realt_secs++;
 }
 
 static void c2_virtt_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c2_virtt_handler : wrong signal %d", signo);
-	else
-	{
-		c2_virtt_secs += 1;
-		return;
-	}
+		c2_virtt_secs++;
 }
 static void c2_proft_handler(int signo)
 {
-	if(signo != SIGALRM)
-		fprintf(stderr, "in c2_proft_handler : wrong signal %d", signo);
-	else
-	{
-		c2_proft_secs += 1;
-		return;
-	}
+		c2_proft_secs++;
 }

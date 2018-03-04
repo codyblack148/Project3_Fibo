@@ -12,4 +12,4 @@ static void c2_realt_handler(int);
 static void c2_virtt_handler(int);
 static void c2_proft_handler(int);
 #define SEC 0
-#define USEC 999999
+#define USEC 1
