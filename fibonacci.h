@@ -11,5 +11,5 @@ static void c1_proft_handler(int);
 static void c2_realt_handler(int);
 static void c2_virtt_handler(int);
 static void c2_proft_handler(int);
-#define SEC 0
-#define USEC 1
+#define SEC 1
+#define USEC 0
