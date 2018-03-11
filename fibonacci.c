@@ -192,7 +192,7 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 				c1_virtt_secs,
 				elapsed_usecs(c1_virtt.it_value.tv_sec,
 							  c1_virtt.it_value.tv_usec) / 1000,
-				delta_time(c1_proft, c1_virtt),
+				delta_time(c1_proft, c1_virtt,c1_realt_secs),
 				(elapsed_usecs(c1_proft.it_value.tv_sec,
 							   c1_proft.it_value.tv_usec) / 1000) -
 				(elapsed_usecs(c1_virtt.it_value.tv_sec,
@@ -260,7 +260,7 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
 				c2_virtt_secs,
 				elapsed_usecs(c2_virtt.it_value.tv_sec,
 							  c2_virtt.it_value.tv_usec) / 1000,
-				delta_time(c2_proft, c2_virtt),
+				delta_time(c2_proft, c2_virtt,c2_realt_secs),
 				(elapsed_usecs(c2_proft.it_value.tv_sec,
 							   c2_proft.it_value.tv_usec) / 1000) -
 				(elapsed_usecs(c2_virtt.it_value.tv_sec,
@@ -305,7 +305,7 @@ c2_proft_sa.sa_handler = &c2_proft_handler;
   				p_virtt_secs,
   				elapsed_usecs(p_virtt.it_value.tv_sec,
   							  p_virtt.it_value.tv_usec) / 1000,
-  				delta_time(p_proft, p_virtt),
+  				delta_time(p_proft, p_virtt, p_realt_secs),
   				(elapsed_usecs(p_proft.it_value.tv_sec,
   							   p_proft.it_value.tv_usec) / 1000) -
   				(elapsed_usecs(p_virtt.it_value.tv_sec,
@@ -329,12 +329,18 @@ long unsigned int fibonacci(unsigned int n)
 }
 long unsigned int elapsed_usecs(long sec, long usec)
 {
-	return ((sec*1000000) + usec);
+	if((sec*SEC_TO_MICRO)> usec)
+			return ( SEC_TO_MICRO -( (sec*SEC_TO_MICRO) - usec));
+	else
+			return ( SEC_TO_MICRO -(usec - (sec*SEC_TO_MICRO) ));
 }
 
-long unsigned int delta_time(struct itimerval n, struct itimerval m)
+long unsigned int delta_time(struct itimerval m, struct itimerval n,long realtime)
 {
-	return m.it_value.tv_sec - n.it_value.tv_sec;
+	if (realtime != 0)
+	 	return (m.it_value.tv_sec - n.it_value.tv_sec)/realtime;
+	else
+		return m.it_value.tv_sec - n.it_value.tv_sec;
 }
 static void p_realt_handler(int signo)
 {
